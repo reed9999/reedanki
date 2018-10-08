@@ -45,39 +45,20 @@ class AnkiHelper():
     showInfo(msg)
     return notes
 
-  def repr_of_Cloze(self):
-    col=self.col
-    byname = col.models.byName("Cloze")
-    print(byname['id'])
-    print(byname.keys())
-    showInfo(
-      "id is {}\n {}".format(byname['id'], 
-      byname.__repr__())
-      # byname.keys())
-    )
-  
-  @classmethod
-  def try_all_ids(cls):
-    col = mw.col
-    just_id = 1443392136631 #The one that works for lookup by mid
-    did = 1502821212137
-    mod = 1537162533
-    lens = [
-      len(col.findNotes("mid:%d" % (just_id))), #16
-      len(col.findNotes("mid:%d" % (did))), #0
-      len(col.findNotes("mid:%d" % (mod))), #0
-    ]
-    msg = col.findNotes("mid:%d" % (just_id)).__repr__()
-    showInfo(msg)
+  # @classmethod
+  # def try_all_ids(cls):
+  #   """Sort out the IDs. just_id is the most useful apparently."""
+  #   col = mw.col
+  #   just_id, did, mod = 1443392136631, 1502821212137, 1537162533
 
 
+HELPER = AnkiHelper()
+def demo_lookup():
+  global HELPER
+  HELPER.notes_for_id(h.value_for_model_name_and_key("Cloze", 'id')) #16 notes
+  HELPER.notes_for_id(h.value_for_model_name_and_key("Basic-pjr")) #95 notes
 
-h = AnkiHelper()
-# AnkiHelper.try_all_ids()  #plain id is what we want.
-# h.repr_of_Cloze()  #works
-h.notes_for_id(h.value_for_model_name_and_key("Cloze", 'id')) #16 notes
-# h.foo(1342704714050L)
-
+demo_lookup()
 class InitialLetterDestroyer():
   """I imported a shared German deck that has tags for 'A-initial-letter', 
   'B-initial-letter', and so forth. I don't see much point to those and I can
