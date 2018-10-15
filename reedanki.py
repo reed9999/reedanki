@@ -1,11 +1,17 @@
 ####
-# Right now the goal is to go through a particular (later, aribtrary)
+# reedanki.py -- very exploratory, ugly code with an obvious security vulnerability.
+# Also way too much use of globals because I wasn't understanding how the interactive prompt
+# was loading Python packages.
+
+# From before:
+# The goal is to go through a particular (later, aribtrary)
 # note type, parse out the content according to a regex, and put the 
 # content into a new note of a different, particular (later, arbitrary)
 # note type
 
 import datetime
 from pprint   import pprint as pp
+from string import ascii_uppercase
 import re
 
 from aqt import mw
@@ -37,6 +43,59 @@ def dangerous_exec():
     exec (the_file.read(), globals(), ldict) 
   return ldict
 
+class AnkiHelper():
+  current_deck = mw.col
+  col = current_deck
+
+
+  def value_for_model_name_and_key(self, name, key='id'):
+
+    model_dict = self.col.models.byName(name)
+    return model_dict[key]
+
+  def notes_for_id(self, id):
+    """The id here is the plain old ['id'] value for the note, not the did or
+    the mod."""
+    #mid is elsewhere known as mod, because it's Anki code, that's why
+    notes = self.col.findNotes("mid:%d" % (id))
+    msg = "model ID is {}\nNumber of notes: {}".format(id, len(notes))
+    print(msg)
+    # showInfo(msg)
+    return notes
+
+  # @classmethod
+  # def try_all_ids(cls):
+  #   """Sort out the IDs. just_id is the most useful apparently."""
+  #   col = mw.col
+  #   just_id, did, mod = 1443392136631, 1502821212137, 1537162533
+
+class BrokenInitialLetterDestroyer():
+  """I imported a shared German deck that has tags for 'A-initial-letter', 
+  'B-initial-letter', and so forth. I don't see much point to those and I can
+  always automate recreating them if needed, but they take up a lot of screen
+  real estate.
+  
+  I don't understand why it became unable to find mw.col (or cls.current_deck)
+  after I moved this to the main reedanki.py file."""
+  current_deck = mw.col
+  helper = AnkiHelper()
+    
+  @classmethod
+  def delete_tag_for_letter(cls, letter):
+    tag_name = "{}-initial-letter".format(letter)
+    notes = cls.current_deck.findNotes("tag:{}".format(tag_name))
+    showInfo(str(len(notes)))
+    
+  @classmethod
+  def go (cls):
+    global ascii_uppercase 
+    for letter in ascii_uppercase[5:25]:
+      cls.delete_tag_for_letter(letter)
+
+    # showInfo(helper.notes_for_id(0).__repr__())
+
+
+
 ###GUI
 def create_a_label(text, x=25):
   label = QLabel()
@@ -56,7 +115,7 @@ def main():
 #  rv = convert_notes_hardcoded_model()
 #  assert rv > 0
 
-  create_a_label("I CREATED SOME NOTES (maybe)", 50)
+  # create_a_label("I EXECUTED SOME ARBITRARY CODE", 10)
 
   
 
@@ -209,45 +268,12 @@ def convert_note(note_id, patt, new_fields):
   match_groups = get_match_groups(patt, src_note['Front'])
   new_count = create_note(SOURCE_DECLENSION, dict_from(match_groups, src_note['Back']))
   return new_count
-
-
-### END PASTE IN
-###     
-###     
     
 
 action = QAction("Philip: Run arbitrary.py", mw)
+action.shortcut = QKeySequence('p')
 action.triggered.connect(main)
 mw.form.menuTools.addAction(action)
 
 
 
-
-# rv=declension_stuff(".*de-dec")
-# make_new_declension_note("[Dd]eclens")
-
-#### MORE FUN STUFF
-
-#This worked 
-# import datetime
-# MOD = 1506565101476
-# new_note = mw.col.newNote()
-# new_note['Front'] = 'This is the front ' +  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-# new_note['Back'] = 'This is the back ' +  datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-# new_count = mw.col.addNote(new_note)
-# print(new_count)
-
-
-# def old_main():
-  # import philip.main
-
-  # patt = "(.*) (.*)\. (.*)\. (.*)\."
-  # fields=get_list_from_file()
-  # global _logstring
-  # try:
-    # new_notes, rv = convert_notes_of_model(SOURCE_DECLENSION_MODEL, DESTINATION_DECLENSION_MODEL, patt, fields)
-  # except:
-    # showInfo(_logstring)
-    # raise
-  # showInfo(_logstring)
-  # create_a_label("RV is %s" % rv, 25)

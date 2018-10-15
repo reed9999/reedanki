@@ -3,9 +3,9 @@ SOURCE_DECLENSION = 'de-declin' #remove this; it's redundant
 import os, sys
 sys.path.insert(0, os.path.abspath("."))
 
-from reedanki import HC_EXAMPLE_DICT, convert_note
+from reedanki import HC_EXAMPLE_DICT, convert_note, AnkiHelper
+from reedanki import BrokenInitialLetterDestroyer
 from pprint   import pprint as pp
-
 
 # action = QAction("Philip 2", mw)
 # action.triggered.connect(main)
@@ -17,57 +17,40 @@ except:
   print("Why on earth can't I load all_tenses? I've tried various ways.")
   # showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
 
-#Trying to debug an Anki plugin is.... challenging.
-# I've not yet gotten Anki via PyCharm to run properly although that is 
-# probably worth pursuing.
-"""
-Heaven only knows what 'did' is supposed to stand for; the choice of var
-names in Anki is quite different from the sort of names I would have
-used."""
-
-class AnkiHelper():
-  current_deck = mw.col
-  col = current_deck
 
 
-  def value_for_model_name_and_key(self, name, key='id'):
-
-    model_dict = self.col.models.byName(name)
-    return model_dict[key]
-
-  def notes_for_id(self, id):
-    """The id here is the plain old ['id'] value for the note, not the did or
-    the mod."""
-    #mid is elsewhere known as mod, because it's Anki code, that's why
-    notes = self.col.findNotes("mid:%d" % (id))
-    msg = "model ID is {}\nNumber of notes: {}".format(id, len(notes))
-    print(msg)
-    showInfo(msg)
-    return notes
-
-  # @classmethod
-  # def try_all_ids(cls):
-  #   """Sort out the IDs. just_id is the most useful apparently."""
-  #   col = mw.col
-  #   just_id, did, mod = 1443392136631, 1502821212137, 1537162533
-
-
-HELPER = AnkiHelper()
 def demo_lookup():
-  global HELPER
-  HELPER.notes_for_id(h.value_for_model_name_and_key("Cloze", 'id')) #16 notes
-  HELPER.notes_for_id(h.value_for_model_name_and_key("Basic-pjr")) #95 notes
+  global AnkiHelper
+  HELPER = AnkiHelper()
+  h = HELPER
+  h.notes_for_id(h.value_for_model_name_and_key("Cloze", 'id')) #16 notes
+  h.notes_for_id(h.value_for_model_name_and_key("Basic-pjr")) #95 notes
 
-demo_lookup()
+# demo_lookup()
 class InitialLetterDestroyer():
   """I imported a shared German deck that has tags for 'A-initial-letter', 
   'B-initial-letter', and so forth. I don't see much point to those and I can
   always automate recreating them if needed, but they take up a lot of screen
   real estate"""
   current_deck = mw.col
+  helper = AnkiHelper()
+    
+  @classmethod
+  def delete_tag_for_letter(cls, letter):
+    tag_name = "{}-initial-letter".format(letter)
+    notes = cls.current_deck.findNotes("tag:{}".format(tag_name))
+    # showInfo(str(len(notes)))
+    return str(len(notes))
+    
   @classmethod
   def go (cls):
-    pass
+    global ascii_uppercase
+    diag = ">>\n" 
+    for letter in ascii_uppercase[5:25]:
+      diag += cls.delete_tag_for_letter(letter)
+      diag += ";\n"
+    showInfo(diag)
+    
 
 InitialLetterDestroyer.go()
   
@@ -85,6 +68,7 @@ def convert_notes_hardcoded_model():
   all_source_note_ids = mw.col.findNotes("mid:%d" % source_model_id)
   THROTTLE = 2
   all_source_note_ids = all_source_note_ids[0 : THROTTLE]
+  # At the moment this creates a bogus note
   rv_notes = [convert_note(id, old_patt, new_fields) for id in all_source_note_ids]
   return rv_notes
   
