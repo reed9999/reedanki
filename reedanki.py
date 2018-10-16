@@ -69,30 +69,37 @@ class AnkiHelper():
   #   col = mw.col
   #   just_id, did, mod = 1443392136631, 1502821212137, 1537162533
 
-class BrokenInitialLetterDestroyer():
-  """I imported a shared German deck that has tags for 'A-initial-letter', 
-  'B-initial-letter', and so forth. I don't see much point to those and I can
-  always automate recreating them if needed, but they take up a lot of screen
-  real estate.
+#No longer broken, and in future should paste arbitrary.py code here and use 
+# this class.
+
+class InitialLetterDestroyer():
+  """Deletes all tags of the form X-initial-letter where X is any of the 26 standard
+  capital letters. I imported a shared German deck with these tags. I don't see much 
+  point to them and I can always automate recreating them if needed.
   
-  I don't understand why it became unable to find mw.col (or cls.current_deck)
-  after I moved this to the main reedanki.py file."""
-  current_deck = mw.col
+  More generally, even though it's a one-time fix, it's a good proof of concept of
+  more complex automation."""
+  # current_deck = mw.col #This is None. Why?
   helper = AnkiHelper()
     
   @classmethod
   def delete_tag_for_letter(cls, letter):
     tag_name = "{}-initial-letter".format(letter)
-    notes = cls.current_deck.findNotes("tag:{}".format(tag_name))
-    showInfo(str(len(notes)))
+    note_ids = cls.current_deck.findNotes("tag:{}".format(tag_name))
+    for id in note_ids:
+      note = mw.col.getNote(id)
+      note.delTag(tag_name)
+      note.flush()
     
   @classmethod
   def go (cls):
-    global ascii_uppercase 
-    for letter in ascii_uppercase[5:25]:
+    cls.current_deck = mw.col #short for collection  
+    # global ascii_uppercase
+    for letter in ascii_uppercase:
       cls.delete_tag_for_letter(letter)
-
-    # showInfo(helper.notes_for_id(0).__repr__())
+    showInfo("""I have removed initial letter tags. Now run 
+      Tools -> Check Database to delete the tags.""")
+    #Eventually I could automate the call to onCheckDB in aqt/main.py.
 
 
 

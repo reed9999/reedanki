@@ -3,19 +3,20 @@ SOURCE_DECLENSION = 'de-declin' #remove this; it's redundant
 import os, sys
 sys.path.insert(0, os.path.abspath("."))
 
-from reedanki import HC_EXAMPLE_DICT, convert_note, AnkiHelper
-from reedanki import BrokenInitialLetterDestroyer
 from pprint   import pprint as pp
+from aqt import mw
+from reedanki import HC_EXAMPLE_DICT, convert_note, AnkiHelper
+from reedanki import InitialLetterDestroyer
+from anki import notes
 
 # action = QAction("Philip 2", mw)
 # action.triggered.connect(main)
 # mw.form.menuTools.addAction(action)
-from aqt import mw
 try:
   import all_tenses as at
 except:
-  print("Why on earth can't I load all_tenses? I've tried various ways.")
-  # showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
+  # print("Why on earth can't I load all_tenses? I've tried various ways.")
+  showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
 
 
 
@@ -25,35 +26,12 @@ def demo_lookup():
   h = HELPER
   h.notes_for_id(h.value_for_model_name_and_key("Cloze", 'id')) #16 notes
   h.notes_for_id(h.value_for_model_name_and_key("Basic-pjr")) #95 notes
+    
+def destroy_initial_letter_tags():
+  InitialLetterDestroyer.go()
 
-# demo_lookup()
-class InitialLetterDestroyer():
-  """I imported a shared German deck that has tags for 'A-initial-letter', 
-  'B-initial-letter', and so forth. I don't see much point to those and I can
-  always automate recreating them if needed, but they take up a lot of screen
-  real estate"""
-  current_deck = mw.col
-  helper = AnkiHelper()
-    
-  @classmethod
-  def delete_tag_for_letter(cls, letter):
-    tag_name = "{}-initial-letter".format(letter)
-    notes = cls.current_deck.findNotes("tag:{}".format(tag_name))
-    # showInfo(str(len(notes)))
-    return str(len(notes))
-    
-  @classmethod
-  def go (cls):
-    global ascii_uppercase
-    diag = ">>\n" 
-    for letter in ascii_uppercase[5:25]:
-      diag += cls.delete_tag_for_letter(letter)
-      diag += ";\n"
-    showInfo(diag)
-    
+destroy_initial_letter_tags()
 
-InitialLetterDestroyer.go()
-  
 def convert_notes_of_model(source_model_id, dest_model_id, old_patt="(.*) (.*)\. (.*)\. (.*)\.", new_fields=[]):
   msg = "convert_notes_of_model() is a little too spaghetti code for us to use right now, but come back to this."
   showInfo(msg)
