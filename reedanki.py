@@ -281,6 +281,3 @@ action = QAction("Philip: Run arbitrary.py", mw)
 action.shortcut = QKeySequence('p')
 action.triggered.connect(main)
 mw.form.menuTools.addAction(action)
-
-
-
