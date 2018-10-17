@@ -1,10 +1,12 @@
 SOURCE_DECLENSION = 'de-declin' #remove this; it's redundant
 # from aqt import mw
 import os, sys
-sys.path.insert(0, os.path.abspath("."))
+# sys.path.insert(0, "/home/philip/.local/share/Anki2/addons/reedanki")
+# showInfo(sys.path.__repr__())
 
 from pprint   import pprint as pp
 from aqt import mw
+from aqt.utils import showWarning, tooltip
 from reedanki import HC_EXAMPLE_DICT, convert_note, AnkiHelper
 from reedanki import InitialLetterDestroyer
 from anki import notes
@@ -12,11 +14,17 @@ from anki import notes
 # action = QAction("Philip 2", mw)
 # action.triggered.connect(main)
 # mw.form.menuTools.addAction(action)
-try:
-  import all_tenses as at
-except:
-  # print("Why on earth can't I load all_tenses? I've tried various ways.")
-  showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
+import reedanki as foo
+
+
+import all_tenses
+# import reedanki.all_tenses as at
+
+# try:
+#   import all_tenses as at
+# except:
+#   # print("Why on earth can't I load all_tenses? I've tried various ways.")
+#   showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
 
 
 
@@ -30,7 +38,18 @@ def demo_lookup():
 def destroy_initial_letter_tags():
   InitialLetterDestroyer.go()
 
-destroy_initial_letter_tags()
+# destroy_initial_letter_tags()
+
+class VerbNoteCreator():
+  def __init__(note_type="verb"):
+    self._note_type = note_type
+
+class RomanceVerbNoteCreator():
+  def __init__(note_type="romance-verb"):
+    super(note_type)
+
+rvnc = RomanceVerbNoteCreator()
+
 
 def convert_notes_of_model(source_model_id, dest_model_id, old_patt="(.*) (.*)\. (.*)\. (.*)\.", new_fields=[]):
   msg = "convert_notes_of_model() is a little too spaghetti code for us to use right now, but come back to this."
