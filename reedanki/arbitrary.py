@@ -1,7 +1,7 @@
 SOURCE_DECLENSION = 'de-declin' #remove this; it's redundant
 # from aqt import mw
 import os, sys
-# sys.path.insert(0, "/home/philip/.local/share/Anki2/addons/reedanki")
+sys.path.insert(0, "/home/philip/.local/share/Anki2/addons/reedanki")
 # showInfo(sys.path.__repr__())
 
 from pprint   import pprint as pp
@@ -41,12 +41,14 @@ def destroy_initial_letter_tags():
 # destroy_initial_letter_tags()
 
 class VerbNoteCreator():
-  def __init__(note_type="verb"):
+  def __init__(self, note_type="verb"):
+    showInfo("Hi I am a {}".format(note_type))
     self._note_type = note_type
 
+
 class RomanceVerbNoteCreator():
-  def __init__(note_type="romance-verb"):
-    super(note_type)
+  def __init__(self, note_type="romance-verb"):
+    super(type(self), self).__init__(note_type)
 
 rvnc = RomanceVerbNoteCreator()
 
