@@ -1,6 +1,7 @@
 SOURCE_DECLENSION = 'de-declin' #remove this; it's redundant
 # from aqt import mw
 import os, sys
+# import importlib #Not loaded?
 sys.path.insert(0, "/home/philip/.local/share/Anki2/addons/reedanki")
 # showInfo(sys.path.__repr__())
 
@@ -14,19 +15,11 @@ from anki import notes
 # action = QAction("Philip 2", mw)
 # action.triggered.connect(main)
 # mw.form.menuTools.addAction(action)
-import reedanki as foo
+# from . import reedanki
 
-
-import all_tenses
+# Adding in the __init__.py to make this a package mysteriously causes Anki
+# not to offer the menu option. Go figure. So for now this has to wait: 
 # import reedanki.all_tenses as at
-
-# try:
-#   import all_tenses as at
-# except:
-#   # print("Why on earth can't I load all_tenses? I've tried various ways.")
-#   showInfo("Why on earth can't I load all_tenses? I've tried various ways.")
-
-
 
 def demo_lookup():
   global AnkiHelper
@@ -40,36 +33,21 @@ def destroy_initial_letter_tags():
 
 # destroy_initial_letter_tags()
 
-class VerbNoteCreator():
-  def __init__(self, note_type="verb"):
-    showInfo("Hi I am a {}".format(note_type))
-    self._note_type = note_type
-
-
-class RomanceVerbNoteCreator():
-  def __init__(self, note_type="romance-verb"):
-    super(type(self), self).__init__(note_type)
-
 rvnc = RomanceVerbNoteCreator()
+rvnc.go()
 
 
-def convert_notes_of_model(source_model_id, dest_model_id, old_patt="(.*) (.*)\. (.*)\. (.*)\.", new_fields=[]):
-  msg = "convert_notes_of_model() is a little too spaghetti code for us to use right now, but come back to this."
-  showInfo(msg)
-  raise msg
 
-def convert_notes_hardcoded_model():
-  source_model_id = SOURCE_DECLENSION_MODEL
-  dest_model_id = source_model_id
-  old_patt="(.*) (.*)\. (.*)\. (.*)\."
-  new_fields=HC_EXAMPLE_DICT.keys()
+class LoggingDict(dict):
+    # Simple example of extending a builtin class
+    def __setitem__(self, key, value):
+      global LoggingDict
+      print("It's just an example. {}".format(value))
+      super(LoggingDict, self).__setitem__(key, value)
 
-  all_source_note_ids = mw.col.findNotes("mid:%d" % source_model_id)
-  THROTTLE = 2
-  all_source_note_ids = all_source_note_ids[0 : THROTTLE]
-  # At the moment this creates a bogus note
-  rv_notes = [convert_note(id, old_patt, new_fields) for id in all_source_note_ids]
-  return rv_notes
+ld = LoggingDict()
+ld[4] = "booyha"
+
   
   
 

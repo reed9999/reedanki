@@ -18,7 +18,9 @@ from aqt import mw
 from aqt.qt import *
 from aqt.utils import showInfo
 
-#reload (philip.main)
+sys.path.insert(0, "/home/philip/.local/share/Anki2/addons/reedanki")
+import all_tenses
+
 
 SOURCE_DECLENSION = 'de-declin'
 SOURCE_DECLENSION_MODEL = 1342704714050L
@@ -277,7 +279,62 @@ def convert_note(note_id, patt, new_fields):
   return new_count
     
 
+
+class VerbNoteCreator(object):
+  def __init__(self, note_type="verb"):
+    showInfo("Hi I am a {}".format(note_type))
+    self._note_type = note_type
+
+  def lookup_and_set_model_id(self):
+      self._model_id = mw.col.models.byName(self._note_type)
+      return self._model_id
+
+  def create_model_if_needed(self):
+      if self.lookup_and_set_model_id():
+        return False
+      new_model = mw.col.models.new(self._note_type)
+      result = mw.col.models.save(m=new_model)
+      print ("Saved it")
+      print ("model = {}".format(new_model))
+      print ("result {}".format(result))
+      return result
+
+  def go(self):
+      self.create_model_if_needed()
+      # Alternatively we could just delete it if it exists
+      # if self._model_id is not None: 
+      #     mw.col.models.byName(self._model_name).delete() #untested
+
+class RomanceVerbNoteCreator(VerbNoteCreator):
+  def __init__(self, note_type="romance-verb"):
+    # global VerbNoteCreator #arbitrary code weirdness
+    showInfo("Hi I am a {} in RVNC".format(note_type))
+    super(RomanceVerbNoteCreator, self).__init__(note_type)
+
+
 action = QAction("Philip: Run arbitrary.py", mw)
 action.shortcut = QKeySequence('p')
 action.triggered.connect(main)
 mw.form.menuTools.addAction(action)
+
+
+
+#####
+# I moved this from arbitrary.py but I don't know how much value it has.
+def convert_notes_of_model(source_model_id, dest_model_id, old_patt="(.*) (.*)\. (.*)\. (.*)\.", new_fields=[]):
+  msg = "convert_notes_of_model() is a little too spaghetti code for us to use right now, but come back to this."
+  showInfo(msg)
+  raise msg
+
+def convert_notes_hardcoded_model():
+  source_model_id = SOURCE_DECLENSION_MODEL
+  dest_model_id = source_model_id
+  old_patt="(.*) (.*)\. (.*)\. (.*)\."
+  new_fields=HC_EXAMPLE_DICT.keys()
+
+  all_source_note_ids = mw.col.findNotes("mid:%d" % source_model_id)
+  THROTTLE = 2
+  all_source_note_ids = all_source_note_ids[0 : THROTTLE]
+  # At the moment this creates a bogus note
+  rv_notes = [convert_note(id, old_patt, new_fields) for id in all_source_note_ids]
+  return rv_notes
